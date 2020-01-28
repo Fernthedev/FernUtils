@@ -1,6 +1,6 @@
 package com.github.fernthedev.fernutils.threads;
 
-import com.github.fernthedev.fernutils.threads.multiple.TaskInfoList;
+import com.github.fernthedev.fernutils.threads.multiple.TaskInfoForLoop;
 import com.github.fernthedev.fernutils.threads.single.TaskInfo;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -68,8 +68,8 @@ public class ThreadUtils {
         return runAsync(buildTaskInfo(task));
     }
 
-//    public static TaskInfoList buildTaskList(List<Runnable> runnables) {
-//        return new TaskInfoList(runnables.parallelStream().map(ThreadUtils::buildTask).collect(Collectors.toList()), null);
+//    public static TaskInfoForLoop buildTaskList(List<Runnable> runnables) {
+//        return new TaskInfoForLoop(runnables.parallelStream().map(ThreadUtils::buildTask).collect(Collectors.toList()), null);
 //    }
 
     /**
@@ -80,7 +80,7 @@ public class ThreadUtils {
      * @param <R>
      * @return
      */
-    public static <T,R> TaskInfoList<T, R> runForLoopAsync(List<T> dataList, Function<T, R> function) {
+    public static <T,R> TaskInfoForLoop<T, R> runForLoopAsync(List<T> dataList, Function<T, R> function) {
         List<Pair<T, TaskFunction<T, R>>> pairList = new ArrayList<>();
 
         for (T data : dataList) {
@@ -97,7 +97,7 @@ public class ThreadUtils {
         }
 
 
-        return new TaskInfoList<>(pairList);
+        return new TaskInfoForLoop<>(pairList);
     }
 
 //

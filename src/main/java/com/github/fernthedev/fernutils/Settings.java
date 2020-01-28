@@ -1,7 +1,7 @@
 package com.github.fernthedev.fernutils;
 
 import com.github.fernthedev.fernutils.threads.ThreadUtils;
-import com.github.fernthedev.fernutils.threads.multiple.TaskInfoList;
+import com.github.fernthedev.fernutils.threads.multiple.TaskInfoForLoop;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 @Setter
 @Data
 @ToString
+/**
+ * Testing
+ */
 public class Settings {
 
     @SettingValue
@@ -107,7 +110,7 @@ public class Settings {
 
         final double[] time = {0};
 
-        TaskInfoList<Field, Pair<String, List<String>>> ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
+        TaskInfoForLoop<Field, Pair<String, List<String>>> ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
             StopWatch stopwatch = new StopWatch();
 
             if (field.isAnnotationPresent(SettingValue.class)) {

@@ -19,3 +19,22 @@ Fsrc/main/java/com/github/fernthedev/fernutils/threads/ThreadUtils.java,a\d\adb
 Psrc/main/java/com/github/fernthedev/fernutils/threads/multiple/TaskInfoList.java,d\c\dc84e161117fd73a97deeca2f2d8449adb2e91ad
 x
 Hsrc/main/java/com/github/fernthedev/fernutils/threads/single/TaskInfo.kt,b\c\bcdba50eccf627d2b80bf425f24c7f3efc998d7f
+T
+$.idea/codeStyles/codeStyleConfig.xml,d\d\dd7b3350c29c49497756c7f32c69a3bed18b1cba
+L
+.idea/codeStyles/Project.xml,6\e\6ecd6000a7b6f4a2884412ff19f74193ed089648
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+7
+gradlew,5\b\5bbfa66edb4db3c7c33c5181f43510990d3307f9
+;
+gradlew.bat,2\a\2a45a911a8f1836b0b6c5b758962572012d8f8c3
+=
+lombok.config,8\2\823fe80d2650ec87c2614800da17ca3a55af96a9
+g
+7src/main/java/com/github/fernthedev/fernutils/Main.java,0\2\02d472aeffa47473645fed68d805193beef936ad
+k
+;src/main/java/com/github/fernthedev/fernutils/Settings.java,a\e\aeb28652162a066ce4d7d3e18cf15f4c99348e0e
+9
+	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d

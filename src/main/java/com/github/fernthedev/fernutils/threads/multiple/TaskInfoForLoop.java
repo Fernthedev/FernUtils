@@ -6,25 +6,25 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
-public class TaskInfoList<T,R> implements InterfaceTaskInfo<
+public class TaskInfoForLoop<T,R> implements InterfaceTaskInfo<
         List<TaskFunction<T, R>>,
         TaskFunction<T,R>
         > {
 
-    private final List<T> fields;
+//    private final List<T> fields;
     private final List<TaskFunction<T, R>> functionList;
 
     private final List<Pair<T, TaskFunction<T, R>>> pairList;
 
     private Map<TaskFunction<T, R>, Thread> runningTasks = new HashMap<>();
 
-    public TaskInfoList(List<Pair<T, TaskFunction<T, R>>> pairList) {
+    public TaskInfoForLoop(List<Pair<T, TaskFunction<T, R>>> pairList) {
         this.pairList = pairList;
-        this.fields = new ArrayList<>();
+//        this.fields = new ArrayList<>();
         this.functionList = new ArrayList<>();
 
         for (Pair<T, TaskFunction<T, R>> pair : pairList) {
-            fields.add(pair.getKey());
+//            fields.add(pair.getKey());
             functionList.add(pair.getRight());
         }
 //        this.fields = pairList.getKey();
@@ -41,7 +41,7 @@ public class TaskInfoList<T,R> implements InterfaceTaskInfo<
             TaskFunction<T, R> function = pair.getRight();
 
             Thread t = new Thread(() -> {
-                R result = function.run(TaskInfoList.this);
+                R result = function.run(TaskInfoForLoop.this);
                 if (result == null) {
                     functionResults.remove(key);
                     return;

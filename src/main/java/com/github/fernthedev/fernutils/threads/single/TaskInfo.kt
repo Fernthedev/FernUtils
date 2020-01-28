@@ -16,6 +16,7 @@ open class TaskInfo(private val task: Task) :
             else throw IllegalArgumentException("Thread is already set. This is a final thread.")
     }
 
+    @Volatile
     private var finished = false;
 
     override fun getTaskInstance(): Task {
