@@ -1,4 +1,4 @@
-package com.github.fernthedev.fernutils.threads;
+package com.github.fernthedev.fernutils.thread;
 
 /**
  *

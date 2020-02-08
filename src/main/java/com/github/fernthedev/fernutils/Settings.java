@@ -1,7 +1,7 @@
 package com.github.fernthedev.fernutils;
 
-import com.github.fernthedev.fernutils.threads.ThreadUtils;
-import com.github.fernthedev.fernutils.threads.multiple.TaskInfoForLoop;
+import com.github.fernthedev.fernutils.thread.ThreadUtils;
+import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -108,13 +108,14 @@ public class Settings {
 //        Map<String, List<String>> stringList = new HashMap<>();
 //        System.out.println("Getting setting values");
 
-        final double[] time = {0};
+        long time;
 
-        TaskInfoForLoop<Field, Pair<String, List<String>>> ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
-            StopWatch stopwatch = new StopWatch();
+
+        StopWatch stopwatch = StopWatch.createStarted();
+        TaskInfoFunctionList<Field, Pair<String, List<String>>> ob = ThreadUtils.runFunctionListAsync(Arrays.asList(getClass().getDeclaredFields()), (field -> {
+            StopWatch stopwatchField = StopWatch.createStarted();
 
             if (field.isAnnotationPresent(SettingValue.class)) {
-//                System.out.println("Field has annotation");
                 SettingValue settingValue = field.getAnnotation(SettingValue.class);
 
                 if (!settingValue.editable() && editable) return null;
@@ -122,13 +123,10 @@ public class Settings {
                 String name = settingValue.name();
 
                 List<String> possibleValues = new ArrayList<>(Arrays.asList(settingValue.values()));
-//                System.out.println("Possible values defined: " + possibleValues.toString());
 
                 if (possibleValues.isEmpty()) {
-//                    System.out.println("Getting possible values because non defined");
                     // ENUM
                     if (field.isEnumConstant()) {
-//                        System.out.println("Getting enums");
                         possibleValues = Arrays.stream(field.getClass().getEnumConstants()).map(s -> {
                             try {
                                 return s.get(this).toString();
@@ -136,17 +134,6 @@ public class Settings {
                                 return null;
                             }
                         }).collect(Collectors.toList());
-
-
-//                        Arrays.stream(constants).forEach(field1 -> {
-//                            try {
-//                                possibleValues.add(field1.get(this).toString());
-//
-//                            } catch (IllegalAccessException e) {
-//                                e.printStackTrace();
-//                            }
-//                        });
-//                        System.out.println("Enum values: " + possibleValues);
                     }
                     // Boolean
                     if (boolean.class.equals(field.getType())) {
@@ -158,12 +145,13 @@ public class Settings {
 
                 if (name.equals("")) name = field.getName();
 
-                System.out.println("Field " + name + " took " + stopwatch.getTime(TimeUnit.MILLISECONDS) + "ms");
-                time[0] += stopwatch.getTime(TimeUnit.MILLISECONDS);
+                System.out.println("Field " + name + " took " + stopwatchField.getTime(TimeUnit.MILLISECONDS) + "ms");
                 return new ImmutablePair <>(name, possibleValues);
             }
             return null;
         }));
+
+
 
         // 51 ms parallel
 
@@ -171,11 +159,17 @@ public class Settings {
 
         ob.awaitFinish(0);
 
+        stopwatch.stop();
+        time = stopwatch.getTime(TimeUnit.MILLISECONDS);
+        System.out.println("Took " + time + "ms for settings");
 
         Map<String, List<String>> returnValues = new HashMap<>();
 
         for (Field field : fieldReturnValues.keySet()) {
             Pair<String, List<String>> pair = fieldReturnValues.get(field);
+
+            if (pair == null) continue;
+
             returnValues.put(pair.getKey(), pair.getRight());
         }
 
@@ -184,11 +178,11 @@ public class Settings {
 
     public Map<String, List<String>> slowCheck(boolean editable) {
         Map<String, List<String>> stringList = new HashMap<>();
-        final double[] time = {0};
+        long time = 0;
 
+        StopWatch stopwatch = StopWatch.createStarted();
         for (Field field : getClass().getDeclaredFields()) {
-            StopWatch stopwatch = new StopWatch();
-            System.out.println("Checking field " + field.getName() + " " + time[0]);
+            System.out.println("Checking field " + field.getName() + " " + time);
 
             if (field.isAnnotationPresent(SettingValue.class)) {
 
@@ -240,11 +234,11 @@ public class Settings {
 
                 stringList.put(name, possibleValues);
                 System.out.println("Field " + name + " took " + stopwatch.getTime(TimeUnit.MILLISECONDS) + "ms");
-                time[0] += stopwatch.getTime(TimeUnit.MILLISECONDS);
+
             }
         }
-
-        System.out.println("Took in total " + time[0]);
+        time = stopwatch.getTime(TimeUnit.MILLISECONDS);
+        System.out.println("Took in total " + time + "ms");
         return stringList;
     }
 
