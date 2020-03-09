@@ -27,13 +27,12 @@ public class TaskInfoForLoop<T> implements MultiThreadedInterfaceTaskInfo<
         runningTasks = Collections.synchronizedMap(new HashMap<>());
 
 
-
-        for (TaskFunction<T, Void> function : functionList) {
+        functionList.parallelStream().forEach(function -> {
             Thread t = new Thread(() -> function.run(TaskInfoForLoop.this));
 
             runningTasks.put(function, t);
             t.start();
-        }
+        });
 
         return null;
     }

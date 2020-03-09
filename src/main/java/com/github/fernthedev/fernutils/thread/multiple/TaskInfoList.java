@@ -1,7 +1,7 @@
 package com.github.fernthedev.fernutils.thread.multiple;
 
 import com.github.fernthedev.fernutils.thread.MultiThreadedInterfaceTaskInfo;
-import com.github.fernthedev.fernutils.thread.Task;
+import com.github.fernthedev.fernutils.thread.functional.Task;
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
 
 import java.util.*;

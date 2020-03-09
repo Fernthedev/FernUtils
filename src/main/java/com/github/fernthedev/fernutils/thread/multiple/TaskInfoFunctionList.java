@@ -30,9 +30,7 @@ public class TaskInfoFunctionList<T,R> implements MultiThreadedInterfaceTaskInfo
 
         Map<T, R> functionResults = new HashMap<>();
 
-        for (TaskFunction<T, R> function : functionMap.keySet()) {
-            T key = functionMap.get(function);
-
+        functionMap.forEach((function, key) -> {
             Thread t = new Thread(() -> {
                 R result = function.run(TaskInfoFunctionList.this);
 
@@ -41,7 +39,7 @@ public class TaskInfoFunctionList<T,R> implements MultiThreadedInterfaceTaskInfo
 
             runningTasks.put(function, t);
             t.start();
-        }
+        });
 
         return functionResults;
     }

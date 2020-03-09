@@ -1,7 +1,7 @@
 package com.github.fernthedev.fernutils.thread.single
 
 import com.github.fernthedev.fernutils.thread.InterfaceTaskInfo
-import com.github.fernthedev.fernutils.thread.Task
+import com.github.fernthedev.fernutils.thread.functional.Task
 import lombok.Data
 
 

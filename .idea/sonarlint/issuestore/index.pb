@@ -32,8 +32,6 @@ Rsrc/main/java/com/github/fernthedev/fernutils/thread/multiple/TaskInfoForLoop.j
 Vsrc/main/java/com/github/fernthedev/fernutils/thread/MultiThreadedInterfaceTaskInfo.kt,2\0\201ebd02c6426788940e05c13143e208c60b3c28
 y
 Isrc/main/java/com/github/fernthedev/fernutils/thread/InterfaceTaskInfo.kt,7\b\7b2aeb56caed2b67f7ab0d363a42974eeec9e569
-n
->src/main/java/com/github/fernthedev/fernutils/thread/Task.java,6\e\6e416588f473d7b7085a60f140f3c54ec86b4267
 u
 Esrc/main/java/com/github/fernthedev/fernutils/thread/ThreadUtils.java,5\a\5a3aeae04edc0a5f53162324045969a09b71d19b
 ‡
@@ -42,3 +40,9 @@ w
 Gsrc/main/java/com/github/fernthedev/fernutils/thread/single/TaskInfo.kt,2\c\2c0a8b2ab0550c9c34e3867291fa6768dad8fdd8
 
 Osrc/main/java/com/github/fernthedev/fernutils/thread/multiple/TaskInfoList.java,8\0\80f030fc5b215dcf55581cd6f0ce6fa1726bd212
+v
+Fsrc/main/java/com/github/fernthedev/fernutils/thread/TaskFunction.java,c\5\c5291b8ddaf905c4e339c21d7689112bf3f5ea1f
+y
+Isrc/main/java/com/github/fernthedev/fernutils/thread/functional/Task.java,7\6\76f81dc51e9ca6fa4c34c57688c4b4a7549b3095
+
+Qsrc/main/java/com/github/fernthedev/fernutils/thread/functional/VoidFunction.java,4\8\48af2db339f3600d1edf35245930491d0b3e1e02
