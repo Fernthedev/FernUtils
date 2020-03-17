@@ -111,53 +111,47 @@ public class Settings {
         Map<String, List<String>> returnValues = new HashMap<>();
         TaskInfoForLoop ob;
 
-        try {
-            ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), field -> {
-                StopWatch stopwatchField = StopWatch.createStarted();
+        ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), field -> {
+            StopWatch stopwatchField = StopWatch.createStarted();
 
-                if (field.isAnnotationPresent(SettingValue.class)) {
-                    SettingValue settingValue = field.getAnnotation(SettingValue.class);
+            if (field.isAnnotationPresent(SettingValue.class)) {
+                SettingValue settingValue = field.getAnnotation(SettingValue.class);
 
-                    if (!settingValue.editable() && editable) return null;
+                if (!settingValue.editable() && editable) return null;
 
-                    String name = settingValue.name();
+                String name = settingValue.name();
 
-                    List<String> possibleValues = new ArrayList<>(Arrays.asList(settingValue.values()));
+                List<String> possibleValues = new ArrayList<>(Arrays.asList(settingValue.values()));
 
-                    if (possibleValues.isEmpty()) {
-                        // ENUM
-                        if (field.isEnumConstant()) {
-                            possibleValues = Arrays.stream(field.getClass().getEnumConstants()).map(s -> {
-                                try {
-                                    return s.get(this).toString();
-                                } catch (IllegalAccessException e) {
-                                    return null;
-                                }
-                            }).collect(Collectors.toList());
-                        }
-                        // Boolean
-                        if (boolean.class.equals(field.getType())) {
-                            possibleValues.add("true");
-                            possibleValues.add("false");
-                        }
+                if (possibleValues.isEmpty()) {
+                    // ENUM
+                    if (field.isEnumConstant()) {
+                        possibleValues = Arrays.stream(field.getClass().getEnumConstants()).map(s -> {
+                            try {
+                                return s.get(this).toString();
+                            } catch (IllegalAccessException e) {
+                                return null;
+                            }
+                        }).collect(Collectors.toList());
                     }
-
-
-                    if (name.equals("")) name = field.getName();
-
-                    if (log)
-                        System.out.println("Field " + name + " took " + stopwatchField.getTime(TimeUnit.MILLISECONDS) + "ms");
-
-
-                    returnValues.put(name, possibleValues);
+                    // Boolean
+                    if (boolean.class.equals(field.getType())) {
+                        possibleValues.add("true");
+                        possibleValues.add("false");
+                    }
                 }
-                return null;
-            });
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            e.printStackTrace();
+
+
+                if (name.equals("")) name = field.getName();
+
+                if (log)
+                    System.out.println("Field " + name + " took " + stopwatchField.getTime(TimeUnit.MILLISECONDS) + "ms");
+
+
+                returnValues.put(name, possibleValues);
+            }
             return null;
-        }
+        });
 
         StopWatch stopwatch = StopWatch.createStarted();
 

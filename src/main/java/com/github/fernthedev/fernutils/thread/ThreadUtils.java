@@ -61,7 +61,7 @@ public class ThreadUtils {
      *                 This handles creating tasks that provide the data from the list into the functions and store them in a list.
      * @return The {@link TaskInfoForLoop} handles the threads and running the tasks.
      */
-    public static <L> TaskInfoForLoop runForLoopAsync(List<L> dataList, Function<L, ?> function, ThreadExecutors executor) throws InterruptedException {
+    public static <L> TaskInfoForLoop runForLoopAsync(List<L> dataList, Function<L, ?> function) {
 
 
         List<Callable<Void>> callableList = dataList.parallelStream().map(l -> (Callable<Void>) () -> {
@@ -73,20 +73,6 @@ public class ThreadUtils {
         return new TaskInfoForLoop(callableList);
 
 //        return s;
-    }
-
-
-    /**
-     * @param dataList
-     * @param function
-     * @param <L>      the function parameter and List type
-     *                 <p>
-     *                 This handles creating tasks that provide the data from the list into the functions and store them in a list.
-     * @return The {@link TaskInfoForLoop} handles the threads and running the tasks.
-     */
-    public static <L> TaskInfoForLoop runForLoopAsync(List<L> dataList, Function<L, ?> function) throws InterruptedException {
-
-        return runForLoopAsync(dataList, function, ThreadExecutors.CACHED_THREADS);
     }
 
     /**
