@@ -11,9 +11,9 @@ public class Main {
     public static void main(String[] args) {
         Settings settings = new Settings();
 
-        Map<String, List<String>> map = settings.getSettingValues(true);
+        Map<String, List<String>> map = settings.multiThread(true, true);
 
-        Map<String, List<String>> mapStr = settings.slowCheck(true);
+        Map<String, List<String>> mapStr = settings.singleThread(true, true);
 
         System.out.println(map + "\n"+ mapStr);
     }

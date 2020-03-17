@@ -1,48 +1,40 @@
 package com.github.fernthedev.fernutils.thread.single
 
 import com.github.fernthedev.fernutils.thread.InterfaceTaskInfo
-import com.github.fernthedev.fernutils.thread.functional.Task
 import lombok.Data
-
+import java.util.concurrent.Future
 
 
 @Data
-open class TaskInfo(private val task: Task) :
-    InterfaceTaskInfo<Task, Task> {
+open class TaskInfo<R>(private val task: Future<R>) :
+    InterfaceTaskInfo<Future<R>, R> {
 
-    lateinit var thread: Thread
+    private lateinit var future: Future<R>;
 
-
-    @Volatile
-    private var finished = false;
-
-    override fun getTaskInstance(): Task {
+    override fun getTaskInstance(): Future<R> {
         return task
     }
-
-    override fun finish(task: Task) {
-        finished = true
-    }
-
     /**
      * Wait for the task to call finish()
      */
     override fun awaitFinish(time: Int) {
-        while (!finished) {
+        while (!future.isDone) {
             Thread.sleep(time.toLong())
         }
     }
 
     @Throws(InterruptedException::class)
     override fun join(time: Int) {
-        thread.join(time.toLong());
+        while(!future.isDone) {
+            Thread.sleep(time.toLong());
+        }
     }
 
     override fun interrupt() {
-        thread.interrupt()
+        future.cancel(true)
     }
 
-
-
-
+    override fun getValues(): R? {
+        return if (future.isDone) future.get() else null
+    }
 }

@@ -1,13 +1,21 @@
 package com.github.fernthedev.fernutils.thread
 
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
+
 /**
- *
+ * @param <T> Task type
+ * @param <F> Task finish instance
+ * @param <M> Multithreaded return
  */
-interface MultiThreadedInterfaceTaskInfo<T, F, M> : InterfaceTaskInfo<T, F> {
+interface MultiThreadedInterfaceTaskInfo<T, M, R> : InterfaceTaskInfo<T, R> {
 
     /**
      * Runs the threads and returns the result of each thread
      */
-    fun runThreads(): M;
+    @Throws(InterruptedException::class)
+    fun runThreads(executor: ExecutorService): M
+
+
 
 }

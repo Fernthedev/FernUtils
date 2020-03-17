@@ -1,144 +1,92 @@
 package com.github.fernthedev.fernutils.thread;
 
-import com.github.fernthedev.fernutils.thread.functional.Task;
-import com.github.fernthedev.fernutils.thread.functional.VoidFunction;
+
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoForLoop;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
-import com.github.fernthedev.fernutils.thread.multiple.TaskInfoList;
-import com.github.fernthedev.fernutils.thread.single.TaskInfo;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ThreadUtils {
 
-    public static Task buildTask(Runnable runnable) {
-        return new Task() {
-            @Override
-            public void run(InterfaceTaskInfo<?, Task> taskInfo) {
-                runnable.run();
-                taskInfo.finish(this);
-            }
-        };
-    }
+    private static final ExecutorService cachedThreadExecutor = Executors.newCachedThreadPool();
+    private static final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
-    public static TaskInfo buildTaskInfo(Runnable task) {
-        return new TaskInfo(buildTask(task));
-    }
 
-    public static TaskInfo buildTaskInfo(Task task) {
-        return new TaskInfo(task);
-    }
+    @AllArgsConstructor
+    public enum ThreadExecutors {
+        CACHED_THREADS(cachedThreadExecutor),
+        SINGLE_THREAD(singleThreadExecutor);
 
-//    public static TaskInfo runAsync(Runnable runnable) {
-//
-//
-//        TaskInfo taskInfo = new TaskInfo(task);
-//
-//        Thread thread = new Thread(() -> task.run(taskInfo));
-//
-//        taskInfo.setThread(thread);
-//
-//        thread.start();
-//
-//        return taskInfo;
-//    }
-
-    public static TaskInfo runAsync(Runnable runnable) {
-        return runAsync(new Task() {
-            @Override
-            public void run(InterfaceTaskInfo<?, Task> taskInfo) {
-                runnable.run();
-                taskInfo.finish(this);
-            }
-        });
+        @Getter
+        private ExecutorService executorService;
     }
 
     /**
      * Runs the task async and sets the TaskInfo parameter of task to TaskInfo
      *
      * @param task     The task to run
-     * @param taskInfo The TaskInfo to use in the Task
      * @return The TaskInfo the Task is linked to
      */
-    public static Thread runAsync(Task task, MultiThreadedInterfaceTaskInfo<?, Task, ?> taskInfo) {
-        Thread thread = new Thread(() -> task.run(taskInfo));
-
-        thread.start();
-
-        return thread;
-    }
-
-    /**
-     * Runs the task async and sets the TaskInfo parameter of task to TaskInfo
-     *
-     * @param task     The task to run
-     * @param taskInfo The TaskInfo to use in the Task
-     * @return The TaskInfo the Task is linked to
-     */
-    public static <T extends TaskInfo> T runAsync(Task task, T taskInfo) {
-        Thread thread = new Thread(() -> task.run(taskInfo));
-
-        taskInfo.setThread(thread);
-
-        thread.start();
-
-        return taskInfo;
-    }
-
-    public static TaskInfo runAsync(Task task) {
-        return runAsync(task, buildTaskInfo(task));
-    }
-
-    public static TaskInfoList buildTaskInfoList(List<Task> tasks) {
-        return new TaskInfoList(tasks);
-    }
-
-    /**
-     * @param dataList
-     * @param function
-     * @param <L>      the function parameter and List type
-     *                 <p>
-     *                 This handles creating tasks that provide the data from the list into the functions and store them in a list.
-     * @return The {@link TaskInfoForLoop} handles the threads and running the tasks.
-     */
-    public static <L> TaskInfoForLoop<L> runForLoopAsync(List<L> dataList, Function<L, ?> function) {
-        List<TaskFunction<L, Void>> pairList = new ArrayList<>();
-
-        dataList.parallelStream().forEach(data -> pairList.add(new TaskFunction<L, Void>() {
-            @Override
-            public Void run(InterfaceTaskInfo<?, TaskFunction<L, Void>> taskInfo) {
-                function.apply(data);
-
-                taskInfo.finish(this);
-                return null;
-            }
-        }));
-
-
-        return new TaskInfoForLoop<>(pairList);
-
-//        return s;
-    }
-
-    /**
-     * @param dataList
-     * @param function
-     * @param <L>      the function parameter and List type
-     *                 <p>
-     *                 This handles creating tasks that provide the data from the list into the functions and store them in a list.
-     * @return The {@link TaskInfoForLoop} handles the threads and running the tasks.
-     */
-    public static <L> TaskInfoForLoop<L> runForLoopAsync(List<L> dataList, VoidFunction<L> function) {
-
-        return runForLoopAsync(dataList, l -> {
-            function.run(l);
+    public static Future<Void> runAsync(Runnable task, ExecutorService executorService) {
+        return runAsync(() -> {
+            task.run();
             return null;
-        });
+        }, executorService);
+    }
+
+    /**
+     * Runs the task async and sets the TaskInfo parameter of task to TaskInfo
+     *
+     * @return The TaskInfo the Task is linked to
+     */
+    public static <R> Future<R> runAsync(Callable<R> callable, ExecutorService executorService) {
+        return executorService.submit(callable);
+    }
+
+    /**
+     * @param dataList
+     * @param function
+     * @param <L>      the function parameter and List type
+     *                 <p>
+     *                 This handles creating tasks that provide the data from the list into the functions and store them in a list.
+     * @return The {@link TaskInfoForLoop} handles the threads and running the tasks.
+     */
+    public static <L> TaskInfoForLoop runForLoopAsync(List<L> dataList, Function<L, ?> function, ThreadExecutors executor) throws InterruptedException {
+
+
+        List<Callable<Void>> callableList = dataList.parallelStream().map(l -> (Callable<Void>) () -> {
+            function.apply(l);
+            return null;
+        }).collect(Collectors.toList());
+
+
+        return new TaskInfoForLoop(callableList);
+
 //        return s;
+    }
+
+
+    /**
+     * @param dataList
+     * @param function
+     * @param <L>      the function parameter and List type
+     *                 <p>
+     *                 This handles creating tasks that provide the data from the list into the functions and store them in a list.
+     * @return The {@link TaskInfoForLoop} handles the threads and running the tasks.
+     */
+    public static <L> TaskInfoForLoop runForLoopAsync(List<L> dataList, Function<L, ?> function) throws InterruptedException {
+
+        return runForLoopAsync(dataList, function, ThreadExecutors.CACHED_THREADS);
     }
 
     /**
@@ -150,21 +98,11 @@ public class ThreadUtils {
      * @return The {@link TaskInfoFunctionList} handles the threads and providing parameters to the functions.
      */
     public static <L, R> TaskInfoFunctionList<L, R> runFunctionListAsync(List<L> dataList, Function<L, R> function) {
-        Map<TaskFunction<L, R>, L> pairList = new HashMap<>();
 
-        dataList.parallelStream().forEach(data -> pairList.put(
-                new TaskFunction<L, R>() {
-                    @Override
-                    public R run(InterfaceTaskInfo<?, TaskFunction<L, R>> taskInfo) {
-                        R dataReturn = function.apply(data);
+        List<Pair<L, Function<L, R>>> callableList = dataList.parallelStream().map(l ->
+                new ImmutablePair<>(l, function)
+        ).collect(Collectors.toList());
 
-                        taskInfo.finish(this);
-                        return dataReturn;
-                    }
-                }, data)
-        );
-
-
-        return new TaskInfoFunctionList<>(pairList);
+        return new TaskInfoFunctionList<>(callableList);
     }
 }

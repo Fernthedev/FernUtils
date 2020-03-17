@@ -1,83 +1,76 @@
 package com.github.fernthedev.fernutils.thread.multiple;
 
 import com.github.fernthedev.fernutils.thread.MultiThreadedInterfaceTaskInfo;
-import com.github.fernthedev.fernutils.thread.TaskFunction;
+import lombok.Getter;
 
-import java.util.*;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
-public class TaskInfoForLoop<T> implements MultiThreadedInterfaceTaskInfo<
-        List<TaskFunction<T, Void>>,
-        TaskFunction<T, Void>,
+public class TaskInfoForLoop implements MultiThreadedInterfaceTaskInfo<
+        List<Callable<Void>>,
+        List<Future<Void>>,
         Void
         > {
 
-    private final List<TaskFunction<T, Void>> functionList;
+    @Getter
+    private List<Future<Void>> future;
 
-    private Map<TaskFunction<T, Void>, Thread> runningTasks = Collections.synchronizedMap(new HashMap<>());
+    private List<Callable<Void>> callableList;
 
-    public TaskInfoForLoop(List<TaskFunction<T, Void>> pairList) {
-        functionList = new ArrayList<>(pairList);
+    public TaskInfoForLoop(List<Callable<Void>> callableList) {
+        this.callableList = callableList;
     }
 
     /**
      *
      * @return The running tasks and their results
      */
-    public Void runThreads() {
-        runningTasks = Collections.synchronizedMap(new HashMap<>());
+    @Override
+    public List<Future<Void>> runThreads(ExecutorService executor) throws InterruptedException {
+        return future = executor.invokeAll(callableList);
+    }
+
+    @Override
+    public List<Callable<Void>> getTaskInstance() {
+        return callableList;
+    }
 
 
-        functionList.parallelStream().forEach(function -> {
-            Thread t = new Thread(() -> function.run(TaskInfoForLoop.this));
+    @Override
+    public void awaitFinish(int time) {
+        join(time);
+    }
 
-            runningTasks.put(function, t);
-            t.start();
+
+    @Override
+    public void join(int time) {
+        future.parallelStream().forEach(trTaskFunction -> {
+            try {
+                while (!trTaskFunction.isDone()) Thread.sleep(time);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Thread.currentThread().interrupt();
+            }
         });
+    }
 
+    @Override
+    public void interrupt() {
+        future.parallelStream().forEach(trTaskFunction -> {
+            trTaskFunction.cancel(true);
+        });
+    }
+
+    @Override
+    public Void getValues() {
         return null;
     }
 
     @Override
-    public List<TaskFunction<T, Void>> getTaskInstance() {
-        return functionList;
-    }
-
-    @Override
-    public void finish(TaskFunction<T, Void> task) {
-        runningTasks.remove(task);
-    }
-
-
-    public void awaitFinish(int time) {
-        while (!runningTasks.isEmpty()) {
-            try {
-                Thread.sleep(time);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                interrupt();
-            }
-        }
-    }
-
-
-    public void join(int time) {
-        while(!functionList.isEmpty()) {
-            Optional<TaskFunction<T, Void>> t = runningTasks.keySet().stream().findFirst();
-            t.ifPresent(trTaskFunction -> {
-                try {
-                    runningTasks.get(trTaskFunction).join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    interrupt();
-                }
-            });
-        }
-    }
-
-    public void interrupt() {
-        while(!functionList.isEmpty()) {
-            Optional<Thread> t = runningTasks.values().stream().findFirst();
-            t.ifPresent(Thread::interrupt);
-        }
+    public Void getValuesAndAwait(int time) {
+        awaitFinish(time);
+        return getValues();
     }
 }

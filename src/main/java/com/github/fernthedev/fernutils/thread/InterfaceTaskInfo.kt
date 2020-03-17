@@ -1,9 +1,10 @@
 package com.github.fernthedev.fernutils.thread
 
 /**
- *
+ * @param <T> Task type
+ * @param <R> Return type
  */
-interface InterfaceTaskInfo<T, F> {
+interface InterfaceTaskInfo<T, R> {
 
     /**
      * Returns the task's instance
@@ -11,12 +12,7 @@ interface InterfaceTaskInfo<T, F> {
     fun getTaskInstance() : T
 
     /**
-     * Finishes listening on awaitFinish to know it's done
-     */
-    fun finish(task: F)
-
-    /**
-     * Wait until the task has called {@link #finish}
+     * Wait until the future has finished
      */
     fun awaitFinish(time: Int = 0)
 
@@ -25,6 +21,13 @@ interface InterfaceTaskInfo<T, F> {
      */
     fun join(time: Int = 0)
 
+    fun getValues() : R?
+
+
+    fun getValuesAndAwait(time: Int = 0) : R? {
+        awaitFinish(time)
+        return getValues()
+    }
 
     /**
      * Interrupts the task's thread
