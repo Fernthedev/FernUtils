@@ -1,7 +1,7 @@
 package com.github.fernthedev.fernutils;
 
 import com.github.fernthedev.fernutils.thread.ThreadUtils;
-import com.github.fernthedev.fernutils.thread.multiple.TaskInfoForLoop;
+import com.github.fernthedev.fernutils.thread.multiple.TaskInfoList;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -109,7 +109,7 @@ public class Settings {
         long time;
 
         Map<String, List<String>> returnValues = new HashMap<>();
-        TaskInfoForLoop ob;
+        TaskInfoList ob;
 
         ob = ThreadUtils.runForLoopAsync(Arrays.asList(getClass().getDeclaredFields()), field -> {
             StopWatch stopwatchField = StopWatch.createStarted();

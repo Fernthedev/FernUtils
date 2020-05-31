@@ -1,13 +1,15 @@
 package com.github.fernthedev.fernutils.thread.single
 
-import com.github.fernthedev.fernutils.thread.InterfaceTaskInfo
+import com.github.fernthedev.fernutils.thread.impl.InterfaceTaskInfo
+import com.github.fernthedev.fernutils.thread.TaskListener
+import com.github.fernthedev.fernutils.thread.impl.BaseTaskInfo
 import lombok.Data
 import java.util.concurrent.Future
 
 
 @Data
 open class TaskInfo<R>(private val task: Future<R>) :
-    InterfaceTaskInfo<Future<R>, R> {
+    BaseTaskInfo<Future<R>, R>() {
 
     private lateinit var future: Future<R>;
 
@@ -17,10 +19,13 @@ open class TaskInfo<R>(private val task: Future<R>) :
     /**
      * Wait for the task to call finish()
      */
-    override fun awaitFinish(time: Int) {
+    override fun awaitFinish(time: Int): R? {
         while (!future.isDone) {
             Thread.sleep(time.toLong())
         }
+
+        return getValues()
+        getValuesAndAwait()
     }
 
     @Throws(InterruptedException::class)

@@ -15,17 +15,17 @@ public class LatencyTest {
     @Test
     public void testAddCheckLatency() {
 
-        final int[] singleThreadAverageNS = {0};
-        final int[] multiThreadAverageNS = {0};
+        final long[] singleThreadAverageNS = {0};
+        final long[] multiThreadAverageNS = {0};
 
-        final int testTimes = 100;
+        final long testTimes = 1000;
 
         Settings singleThreadSettings = new Settings();
         Settings multiThreadSettings = new Settings();
 
         Thread singleThread = new Thread(() -> {
             for (int i = 0; i < testTimes; i++) {
-                System.out.println("Doing single thread " + i + " Current average: " + TimeUnit.NANOSECONDS.toMillis(singleThreadAverageNS[0] / testTimes));
+                System.out.println("Doing single thread " + i + " Current average: " + TimeUnit.NANOSECONDS.toMillis(singleThreadAverageNS[0] / ((long) i + 1) ));
                 StopWatch stopWatch = StopWatch.createStarted();
                 Map<String, List<String>> mapStr = singleThreadSettings.singleThread(false, false);
                 stopWatch.stop();
@@ -38,7 +38,7 @@ public class LatencyTest {
 
         Thread multiThread = new Thread(() -> {
             for (int i = 0; i < testTimes; i++) {
-                System.out.println("Doing multithread " + i + " Current average: " + TimeUnit.NANOSECONDS.toMillis(multiThreadAverageNS[0] / testTimes));
+                System.out.println("Doing multithread " + i + " Current average: " + TimeUnit.NANOSECONDS.toMillis(multiThreadAverageNS[0] / ((long) i + 1)));
                 StopWatch stopWatch = StopWatch.createStarted();
                 Map<String, List<String>> mapStr = multiThreadSettings.multiThread(false, false);
                 stopWatch.stop();
@@ -55,6 +55,7 @@ public class LatencyTest {
             singleThread.join();
             multiThread.join();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         }
 

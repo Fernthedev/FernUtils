@@ -1,6 +1,6 @@
 package com.github.fernthedev.fernutils.thread.multiple;
 
-import com.github.fernthedev.fernutils.thread.MultiThreadedInterfaceTaskInfo;
+import com.github.fernthedev.fernutils.thread.impl.BaseMultiThreadedTaskInfo;
 import lombok.Getter;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-public class TaskInfoForLoop implements MultiThreadedInterfaceTaskInfo<
+public class TaskInfoList extends BaseMultiThreadedTaskInfo<
         List<Callable<Void>>,
         List<Future<Void>>,
         Void
@@ -19,7 +19,7 @@ public class TaskInfoForLoop implements MultiThreadedInterfaceTaskInfo<
 
     private List<Callable<Void>> callableList;
 
-    public TaskInfoForLoop(List<Callable<Void>> callableList) {
+    public TaskInfoList(List<Callable<Void>> callableList) {
         this.callableList = callableList;
     }
 
@@ -46,6 +46,8 @@ public class TaskInfoForLoop implements MultiThreadedInterfaceTaskInfo<
 
     @Override
     public void join(int time) {
+        if (future == null) throw new IllegalStateException("The threads have not been started yet with runThreads();");
+
         future.parallelStream().forEach(trTaskFunction -> {
             try {
                 while (!trTaskFunction.isDone()) Thread.sleep(time);

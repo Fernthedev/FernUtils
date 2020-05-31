@@ -1,12 +1,12 @@
 package com.github.fernthedev.fernutils.thread.multiple;
 
-import com.github.fernthedev.fernutils.thread.MultiThreadedInterfaceTaskInfo;
+import com.github.fernthedev.fernutils.thread.impl.BaseMultiThreadedTaskInfo;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -14,15 +14,15 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class TaskInfoFunctionList<T, R> implements MultiThreadedInterfaceTaskInfo<
-        List<Pair<T ,Function<T, R>>>,
-//        TaskFunction<T,R>,
+public class TaskInfoFunctionList<T, R> extends BaseMultiThreadedTaskInfo<
+        List<Pair<T, Function<T, R>>>,
         List<Future<Pair<T, R>>>,
-        Map<T, R>
-        > {
+        Map<T, R>> {
 
     private List<Future<Pair<T, R>>> futureList;
     private List<Pair<T, Function<T, R>>> functionList;
+
+
 
 //    private final Map<TaskFunction<T, R>, T> functionMap;
 //
@@ -80,7 +80,13 @@ public class TaskInfoFunctionList<T, R> implements MultiThreadedInterfaceTaskInf
 //    }
 
 
+    private void checkStarted() {
+        if (futureList == null) throw new IllegalStateException("The threads have not been started yet with runThreads();");
+    }
+
     public void awaitFinish(int time) {
+        checkStarted();
+
         futureList.parallelStream().forEach(trTaskFunction -> {
             try {
                 while (!trTaskFunction.isDone()) Thread.sleep(time);
@@ -97,6 +103,8 @@ public class TaskInfoFunctionList<T, R> implements MultiThreadedInterfaceTaskInf
     }
 
     public void interrupt() {
+        checkStarted();
+
         futureList.parallelStream().forEach(trTaskFunction -> {
             trTaskFunction.cancel(true);
         });
@@ -105,17 +113,19 @@ public class TaskInfoFunctionList<T, R> implements MultiThreadedInterfaceTaskInf
 
     @Override
     public Map<T, R> getValues() {
+        checkStarted();
+
         return futureList.parallelStream().filter(Future::isDone).map(pairFuture -> {
             try {
-                return pairFuture.get();
+                return Optional.ofNullable(pairFuture.get());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            return null;
-        }).filter(Objects::nonNull).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            return Optional.empty();
+        }).filter(Optional::isPresent).map(o -> (Pair<T, R>) o.get()).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
     }
 
     @Override
