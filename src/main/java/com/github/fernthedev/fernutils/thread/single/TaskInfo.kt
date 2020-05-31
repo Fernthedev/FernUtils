@@ -19,13 +19,10 @@ open class TaskInfo<R>(private val task: Future<R>) :
     /**
      * Wait for the task to call finish()
      */
-    override fun awaitFinish(time: Int): R? {
+    override fun awaitFinish(time: Int) {
         while (!future.isDone) {
             Thread.sleep(time.toLong())
         }
-
-        return getValues()
-        getValuesAndAwait()
     }
 
     @Throws(InterruptedException::class)

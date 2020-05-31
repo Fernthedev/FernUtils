@@ -18,7 +18,7 @@ public class LatencyTest {
         final long[] singleThreadAverageNS = {0};
         final long[] multiThreadAverageNS = {0};
 
-        final long testTimes = 1000;
+        final long testTimes = 320;
 
         Settings singleThreadSettings = new Settings();
         Settings multiThreadSettings = new Settings();
