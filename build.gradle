@@ -27,7 +27,7 @@ dependencies {
     api 'com.github.Fernthedev:fern-configmanager:1.1.4'
     api 'org.apache.commons:commons-lang3:3.10'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
 }
 
 test {
