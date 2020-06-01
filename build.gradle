@@ -9,7 +9,7 @@ apply plugin: 'kotlin'
 
 group 'com.github.Fernthedev'
 archivesBaseName = "FernUtils"
-version '1.3.3'
+version '1.3.4'
 
 sourceCompatibility = 1.8
 

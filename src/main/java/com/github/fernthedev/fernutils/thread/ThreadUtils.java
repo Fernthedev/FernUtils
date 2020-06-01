@@ -5,6 +5,7 @@ import com.github.fernthedev.fernutils.collections.ListUtils;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoFunctionList;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoList;
 import com.github.fernthedev.fernutils.thread.multiple.TaskInfoSplitList;
+import com.github.fernthedev.fernutils.thread.single.TaskInfo;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,7 +42,7 @@ public class ThreadUtils {
      * @param task     The task to run
      * @return The TaskInfo the Task is linked to
      */
-    public static Future<Void> runAsync(Runnable task, ExecutorService executorService) {
+    public static TaskInfo<Void> runAsync(Runnable task, ExecutorService executorService) {
         return runAsync(() -> {
             task.run();
             return null;
@@ -54,8 +54,8 @@ public class ThreadUtils {
      *
      * @return The TaskInfo the Task is linked to
      */
-    public static <R> Future<R> runAsync(Callable<R> callable, ExecutorService executorService) {
-        return executorService.submit(callable);
+    public static <R> TaskInfo<R> runAsync(Callable<R> callable, ExecutorService executorService) {
+        return new TaskInfo<>(executorService.submit(callable));
     }
 
     public static TaskInfoList runAsyncList(Collection<Runnable> runnables) {

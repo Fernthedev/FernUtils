@@ -18,7 +18,7 @@ public abstract class BaseTaskInfo<T, R> implements InterfaceTaskInfo<T, R> {
 
     public BaseTaskInfo() {
         ExecutorService service = Executors.newCachedThreadPool();
-        ThreadUtils.runAsync(() -> {
+        service.submit(() -> {
             R result = getValuesAndAwait(1);
             try {
                 ThreadUtils.runForLoopAsync(taskListeners, trTaskListener -> {
@@ -28,7 +28,7 @@ public abstract class BaseTaskInfo<T, R> implements InterfaceTaskInfo<T, R> {
                 Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
-        }, service);
+        });
     }
 
     @Override
