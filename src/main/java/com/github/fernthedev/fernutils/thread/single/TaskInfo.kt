@@ -9,8 +9,6 @@ import java.util.concurrent.Future
 open class TaskInfo<R>(private val task: Future<R>) :
     BaseTaskInfo<Future<R>, R>() {
 
-    private lateinit var future: Future<R>;
-
     override fun getTaskInstance(): Future<R> {
         return task
     }
@@ -18,23 +16,23 @@ open class TaskInfo<R>(private val task: Future<R>) :
      * Wait for the task to finsih
      */
     override fun awaitFinish(time: Int) {
-        while (!future.isDone) {
+        while (!task.isDone) {
             Thread.sleep(time.toLong())
         }
     }
 
     @Throws(InterruptedException::class)
     override fun join(time: Int) {
-        while(!future.isDone) {
+        while(!task.isDone) {
             Thread.sleep(time.toLong())
         }
     }
 
     override fun interrupt() {
-        future.cancel(true)
+        task.cancel(true)
     }
 
     override fun getValues(): R? {
-        return if (future.isDone) future.get() else null
+        return if (task.isDone) task.get() else null
     }
 }

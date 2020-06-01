@@ -10,9 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class BaseTaskInfo<T, R> implements InterfaceTaskInfo<T, R> {
-
-
-
     protected List<TaskListener<InterfaceTaskInfo<T, R>, R>> taskListeners = new ArrayList<>();
 
 
