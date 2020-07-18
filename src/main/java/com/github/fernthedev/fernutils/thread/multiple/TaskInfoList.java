@@ -3,19 +3,21 @@ package com.github.fernthedev.fernutils.thread.multiple;
 import com.github.fernthedev.fernutils.thread.impl.BaseMultiThreadedTaskInfo;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class TaskInfoList extends BaseMultiThreadedTaskInfo<
         List<Callable<Void>>,
-        List<Future<Void>>,
+        List<CompletableFuture<Void>>,
         Void
         > {
 
     @Getter
-    private List<Future<Void>> future;
+    private List<CompletableFuture<Void>> future;
 
     private List<Callable<Void>> callableList;
 
@@ -28,8 +30,18 @@ public class TaskInfoList extends BaseMultiThreadedTaskInfo<
      * @return The running tasks and their results
      */
     @Override
-    public List<Future<Void>> runThreads(ExecutorService executor) throws InterruptedException {
-        return future = executor.invokeAll(callableList);
+    public List<CompletableFuture<Void>> runThreads(ExecutorService executor) {
+        future = new ArrayList<>();
+
+        callableList.forEach(voidCallable -> future.add(CompletableFuture.runAsync(() -> {
+            try {
+                voidCallable.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executor)));
+
+        return future;
     }
 
     @Override
@@ -50,19 +62,19 @@ public class TaskInfoList extends BaseMultiThreadedTaskInfo<
 
         future.parallelStream().forEach(trTaskFunction -> {
             try {
-                while (!trTaskFunction.isDone()) Thread.sleep(time);
+                trTaskFunction.get();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         });
     }
 
     @Override
     public void interrupt() {
-        future.parallelStream().forEach(trTaskFunction -> {
-            trTaskFunction.cancel(true);
-        });
+        future.parallelStream().forEach(trTaskFunction -> trTaskFunction.cancel(true));
     }
 
     @Override

@@ -1,10 +1,5 @@
 package com.github.fernthedev.fernutils.thread.impl
 
-import com.github.fernthedev.fernutils.thread.TaskListener
-import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
-import java.util.function.Consumer
-
 /**
  * @param <T> Task type
  * @param <R> Return type
@@ -33,8 +28,6 @@ interface InterfaceTaskInfo<T, R> {
         awaitFinish(time)
         return getValues()
     }
-
-    fun onFinish(listener: TaskListener<InterfaceTaskInfo<T, R>, R>)
 
     /**
      * Interrupts the task's thread

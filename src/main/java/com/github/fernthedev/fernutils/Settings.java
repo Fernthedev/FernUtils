@@ -157,14 +157,9 @@ public class Settings {
 
         // 51 ms parallel
 
-        try {
-            ob.runThreads(ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
+        ob.runThreads(ThreadUtils.ThreadExecutors.CACHED_THREADS.getExecutorService());
 
-            ob.awaitFinish(2);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            e.printStackTrace();
-        }
+        ob.awaitFinish(2);
 
         stopwatch.stop();
         time = stopwatch.getTime(TimeUnit.MILLISECONDS);

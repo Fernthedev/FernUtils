@@ -4,22 +4,20 @@ import com.github.fernthedev.fernutils.thread.impl.BaseMultiThreadedTaskInfo;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TaskInfoFunctionList<T, R> extends BaseMultiThreadedTaskInfo<
         List<Pair<T, Function<T, R>>>,
-        List<Future<Pair<T, R>>>,
+        List<CompletableFuture<Pair<T, R>>>,
         Map<T, R>> {
 
-    private List<Future<Pair<T, R>>> futureList;
+    private List<CompletableFuture<Pair<T, R>>> futureList;
     private List<Pair<T, Function<T, R>>> functionList;
 
 
@@ -39,7 +37,7 @@ public class TaskInfoFunctionList<T, R> extends BaseMultiThreadedTaskInfo<
      *
      * @return The running tasks and their results
      */
-    public List<Future<Pair<T, R>>> runThreads(ExecutorService executor) throws InterruptedException {
+    public List<CompletableFuture<Pair<T, R>>> runThreads(ExecutorService executor) throws InterruptedException {
 
         List<Callable<Pair<T, R>>> callableList = functionList.parallelStream()
                 .map(tFunctionPair -> (Callable<Pair<T, R>>) () ->
@@ -48,7 +46,25 @@ public class TaskInfoFunctionList<T, R> extends BaseMultiThreadedTaskInfo<
                                 tFunctionPair.getRight().apply(tFunctionPair.getLeft()))
                 ).collect(Collectors.toList());
 
-        return futureList = executor.invokeAll(callableList);
+        futureList = new ArrayList<>();
+
+
+
+        callableList.forEach(pairCallable -> {
+            CompletableFuture<Pair<T, R>> completableFuture = new CompletableFuture<>();
+            futureList.add(completableFuture);
+
+            executor.submit(() -> {
+                try {
+                    completableFuture.complete(pairCallable.call());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+        });
+
+        return futureList;
 
 //        runningTasks = Collections.synchronizedMap(new HashMap<>());
 //
@@ -89,10 +105,12 @@ public class TaskInfoFunctionList<T, R> extends BaseMultiThreadedTaskInfo<
 
         futureList.parallelStream().forEach(trTaskFunction -> {
             try {
-                while (!trTaskFunction.isDone()) Thread.sleep(time);
+                trTaskFunction.get();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         });
     }

@@ -7,17 +7,18 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 public class TaskInfoSplitList extends BaseMultiThreadedTaskInfo<
         List<List<Callable<Void>>>,
-        List<Future<Void>>,
+        List<CompletableFuture<Void>>,
         Void
         > {
 
     @Getter
-    private List<Future<Void>> futureList;
+    private List<CompletableFuture<Void>> futureList;
 
     private List<List<Callable<Void>>> callableList;
 
@@ -30,17 +31,20 @@ public class TaskInfoSplitList extends BaseMultiThreadedTaskInfo<
      * @return The running tasks and their results
      */
     @Override
-    public List<Future<Void>> runThreads(@NotNull ExecutorService executor) {
+    public List<CompletableFuture<Void>> runThreads(@NotNull ExecutorService executor) {
 
         futureList = new ArrayList<>();
 
         for (List<Callable<Void>> c : callableList) {
-            futureList.add(executor.submit(() -> {
+            futureList.add(CompletableFuture.runAsync(() -> {
                 for (Callable<Void> callable : c) {
-                    callable.call();
+                    try {
+                        callable.call();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-                return null;
-            }));
+            }, executor));
         }
 
         return futureList;
@@ -68,10 +72,12 @@ public class TaskInfoSplitList extends BaseMultiThreadedTaskInfo<
 
         futureList.parallelStream().forEach(trTaskFunction -> {
             try {
-                while (!trTaskFunction.isDone()) Thread.sleep(time);
+                trTaskFunction.get();
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         });
     }
