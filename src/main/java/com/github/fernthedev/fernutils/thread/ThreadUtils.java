@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -55,7 +56,14 @@ public class ThreadUtils {
      * @return The TaskInfo the Task is linked to
      */
     public static <R> TaskInfo<R> runAsync(Callable<R> callable, ExecutorService executorService) {
-        return new TaskInfo<>(executorService.submit(callable));
+        return new TaskInfo<>(CompletableFuture.supplyAsync(() -> {
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }, executorService));
     }
 
     public static TaskInfoList runAsyncList(Collection<Runnable> runnables) {

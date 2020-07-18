@@ -2,30 +2,26 @@ package com.github.fernthedev.fernutils.thread.single
 
 import com.github.fernthedev.fernutils.thread.impl.BaseTaskInfo
 import lombok.Data
-import java.util.concurrent.Future
+import java.util.concurrent.CompletableFuture
 
 
 @Data
-open class TaskInfo<R>(private val task: Future<R>) :
-    BaseTaskInfo<Future<R>, R>() {
+open class TaskInfo<R>(private val task: CompletableFuture<R>) :
+    BaseTaskInfo<CompletableFuture<R>, R>() {
 
-    override fun getTaskInstance(): Future<R> {
+    override fun getTaskInstance(): CompletableFuture<R> {
         return task
     }
     /**
      * Wait for the task to finsih
      */
     override fun awaitFinish(time: Int) {
-        while (!task.isDone) {
-            Thread.sleep(time.toLong())
-        }
+        task.get()
     }
 
     @Throws(InterruptedException::class)
     override fun join(time: Int) {
-        while(!task.isDone) {
-            Thread.sleep(time.toLong())
-        }
+        task.join()
     }
 
     override fun interrupt() {
@@ -33,6 +29,6 @@ open class TaskInfo<R>(private val task: Future<R>) :
     }
 
     override fun getValues(): R? {
-        return if (task.isDone) task.get() else null
+        return task.getNow(null)
     }
 }
