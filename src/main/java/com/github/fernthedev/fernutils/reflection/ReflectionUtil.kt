@@ -27,12 +27,14 @@ object ReflectionUtil {
         classParser[clazz] = {s: String -> parser(s) } // Wrap to avoid type error
     }
 
+    @JvmStatic
     fun <T : Any> getClassParser(
         clazz: Class<T>
     ): (String) -> T {
         return checkNotNull(classParser[clazz]) as (String) -> T
     }
 
+    @JvmStatic
     fun <T : Any> parse(
         string: String,
         clazz: Class<T>
