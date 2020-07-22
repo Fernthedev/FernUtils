@@ -48,11 +48,10 @@ object ArgumentArrayUtils {
     fun parseArguments(args: List<String>, map: Map<String, (Queue<String>) -> Unit>) {
         val queue = LinkedList<String>(args);
 
-        for (s in args) {
-            queue.pop()
-
-            map[s]?.invoke(LinkedList<String>(queue))
+        while (!queue.isEmpty()) {
+            map[queue.pop()]?.invoke(queue)
         }
+
     }
 
 

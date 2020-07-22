@@ -1,10 +1,8 @@
 package com.github.fernthedev.fernutils.strings;
 
-import java.util.regex.Pattern;
-
 public class StringUtil {
 
-    private static final Pattern camelCasePattern = Pattern.compile("([a-z]+)([A-Z]+)");
+    private StringUtil() {}
 
     public static String lowerCamelCaseToUpperCamelCase(String s) {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);

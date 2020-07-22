@@ -16,11 +16,11 @@ class ArgumentTestKotlin {
         parseArguments(
             args,
             "w" to
-                    { strings: Queue<String> ->
+                    { _: Queue<String> ->
                         println("The argument w was found")
                     },
             "-test" to
-                    { strings: Queue<String> ->
+                    { _: Queue<String> ->
                         println("The argument -test was found")
                         wasFound.set(true)
                     }
@@ -40,7 +40,7 @@ class ArgumentTestKotlin {
         parseArguments(
             args,
             "w" to
-                    { strings: Queue<String> ->
+                    { _: Queue<String> ->
                         println("The argument w was found")
                     },
             "-test" to
