@@ -4,6 +4,7 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import lombok.NonNull;
 
+import javax.annotation.CheckReturnValue;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -21,6 +22,13 @@ public class JavaArgumentTreeHelper {
         this.args = args;
     }
 
+    /**
+     * Handles the argument
+     * @param arg the arg checked to call the consumer
+     * @param queue the consumer that is called when arg is detected
+     *
+     */
+    @CheckReturnValue
     public JavaArgumentTreeHelper handle(String arg, Consumer<Queue<String>> queue) {
         finderMap.put(arg, queue);
 

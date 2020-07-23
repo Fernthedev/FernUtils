@@ -1,6 +1,7 @@
 package com.github.fernthedev.fernutils.console
 
 import java.util.*
+import javax.annotation.CheckReturnValue
 
 /**
  * This is meant for parsing tree
@@ -79,6 +80,7 @@ object ArgumentTreeUtils {
      * friendly in Java
      */
     @JvmStatic
+    @CheckReturnValue
     fun parseArguments(args: List<String>): JavaArgumentTreeHelper {
         return parseArguments(args.toTypedArray())
     }
@@ -91,6 +93,7 @@ object ArgumentTreeUtils {
      * friendly in Java
      */
     @JvmStatic
+    @CheckReturnValue
     fun parseArguments(args: Array<String>): JavaArgumentTreeHelper {
         return JavaArgumentTreeHelper(args);
     }

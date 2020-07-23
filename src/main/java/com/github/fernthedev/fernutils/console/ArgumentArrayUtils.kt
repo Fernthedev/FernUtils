@@ -1,6 +1,7 @@
 package com.github.fernthedev.fernutils.console
 
 import java.util.*
+import javax.annotation.CheckReturnValue
 
 object ArgumentArrayUtils {
 
@@ -63,6 +64,7 @@ object ArgumentArrayUtils {
      * friendly in Java
      */
     @JvmStatic
+    @CheckReturnValue
     fun parseArguments(args: List<String>): JavaArgumentArrayHelper {
         return parseArguments(args.toTypedArray())
     }
@@ -75,6 +77,7 @@ object ArgumentArrayUtils {
      * friendly in Java
      */
     @JvmStatic
+    @CheckReturnValue
     fun parseArguments(args: Array<String>): JavaArgumentArrayHelper {
         return JavaArgumentArrayHelper(args);
     }

@@ -3,6 +3,7 @@ package com.github.fernthedev.fernutils.console;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
+import javax.annotation.CheckReturnValue;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -15,6 +16,13 @@ public class JavaArgumentArrayHelper {
         this.args = args;
     }
 
+    /**
+     * Handles the argument
+     * @param arg the arg checked to call the function
+     * @param queue the function that is called when arg is detected
+     *
+     */
+    @CheckReturnValue
     public JavaArgumentArrayHelper handle(String arg, Consumer<Queue<String>> queue) {
         finderMap.put(arg, queue);
 
