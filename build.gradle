@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     // 2. Use Guava types in your public API:
-    api("com.google.guava:guava:29.0-jre")
+    api("com.google.guava:guava:30.1-jre")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     api 'com.github.Fernthedev:fern-configmanager:1.1.4'
