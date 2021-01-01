@@ -17,6 +17,8 @@ object ReflectionUtil {
         registerClassParser(Boolean::class.java) { s -> s.toBoolean()}
         registerClassParser(BigDecimal::class.java) { s -> s.toBigDecimal()}
         registerClassParser(Byte::class.java) { s -> s.toByte()}
+        registerClassParser(String::class.java) { s -> s}
+
     }
 
     @JvmStatic
@@ -39,6 +41,12 @@ object ReflectionUtil {
         string: String,
         clazz: Class<T>
     ): T {
+        if (clazz.isEnum) {
+            val enumClass: Class<out Enum<*>> = clazz.asSubclass(Enum::class.java);
+
+            return searchEnum(enumClass, string)!! as T
+        }
+
         return checkNotNull(classParser[clazz])(string) as T
     }
 
@@ -77,7 +85,7 @@ object ReflectionUtil {
 
     @JvmStatic
     fun <T : Enum<*>?> searchEnum(
-        enumeration: Class<T>,
+        enumeration: Class<out T>,
         search: String?
     ): T? {
         for (each in enumeration.enumConstants) {
